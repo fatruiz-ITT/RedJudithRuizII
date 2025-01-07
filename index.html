@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Red Judith Ruiz II</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        .main-container {
+            max-width: 800px;
+            margin: auto;
+        }
+        .welcome-message {
+            font-size: 1.25rem;
+            margin-bottom: 30px;
+        }
+        .card-btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 150px;
+            font-size: 1.25rem;
+            cursor: pointer;
+            text-align: center;
+        }
+        .card-btn i {
+            font-size: 3rem;
+        }
+        .custom-btn-group .card {
+            margin: 10px;
+            border: 1px solid #ccc;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+            height: auto;
+        }
+        .custom-btn-group .card:hover {
+            transform: scale(1.05);
+        }
+        .card-body h5 {
+            margin-top: 10px;
+            font-size: 1.2rem;
+        }
+        .responsive-table {
+            display: none;
+            margin-top: 20px;
+        }
+        .hidden {
+            display: none;
+        }
+        .table-wrapper {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container mt-5 main-container">
+        <div class="text-center">
+            <h1 class="mb-4">Red Judith Ruiz II</h1>
+            <p class="welcome-message">Bienvenidos a tu página para control de pagos. Aquí podrás visualizar los pagos realizados y los que faltan, además del acumulado de tu caja de ahorro si realizas aportes, y el progreso de tus compañeros. Por favor, selecciona una opción:</p>
+        </div>
+
+        <!-- Botones principales con iconos y diseño tarjeta -->
+        <div class="d-flex flex-wrap justify-content-center custom-btn-group">
+            <div class="col-12 col-md-5 col-lg-3">
+                <div class="card btn btn-primary card-btn" id="btnParticipante">
+                    <div class="card-body text-center">
+                        <i class="fas fa-users"></i>
+                        <h5>Ver Pagos</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-5 col-lg-3">
+                <div class="card btn btn-info card-btn" id="btnAsesorEncargada">
+                    <div class="card-body text-center">
+                        <i class="fas fa-user-cog"></i>
+                        <h5>Asesor-Encargada</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulario de Login -->
+        <div id="loginForm" class="card shadow-lg mt-4 hidden">
+            <div class="card-header bg-secondary text-white text-center">
+                <h3>Iniciar Sesión</h3>
+            </div>
+            <div class="card-body">
+                <form id="login">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Usuario:</label>
+                        <input type="text" id="username" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Contraseña:</label>
+                        <input type="password" id="password" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Ingresar</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Mensaje de error de login -->
+        <div id="loginError" class="alert alert-danger hidden">
+            <strong>¡Error!</strong> Sección solo para Asesor o Encargada. Si eres alguna de ellas, contacta a Judith para actualizar la contraseña.
+        </div>
+
+        <!-- Opciones de Participante y Asesor -->
+        <div id="participanteSelection" class="hidden">
+            <div class="mb-3">
+                <label for="participantFilter" class="form-label">Filtrar por participante:</label>
+                <select id="participantFilter" class="form-select" required>
+                    <option value="">Todos</option>
+                </select>
+            </div>
+
+            <!-- Tabla de Participantes -->
+            <div id="participanteTable" class="responsive-table">
+                <div class="card shadow-lg">
+                    <div class="card-header bg-primary text-white text-center">
+                        <h3>Participantes</h3>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped table-bordered">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Participante</th>
+                                    <th>Semana</th>
+                                    <th>Fecha</th>
+                                    <th>Pago</th>
+                                    <th>Abono para ahorro</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Filas generadas dinámicamente -->
+                            </tbody>
+                        </table>
+                        <div class="text-center">
+                            <button class="btn btn-success" id="printBtn">Imprimir / Guardar PDF</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulario Asesor Encargada -->
+        <div id="asesorEncargadaForm" class="card shadow-lg mt-4 hidden">
+            <div class="card-header bg-secondary text-white text-center">
+                <h3>Registro de Pagos</h3>
+            </div>
+            <div class="card-body">
+                <form id="paymentForm">
+                    <div class="mb-3">
+                        <label for="participantSelect" class="form-label">Participante:</label>
+                        <select id="participantSelect" class="form-select" required>
+                            <option value="">Seleccione un participante</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="paymentDate" class="form-label">Fecha de pago:</label>
+                        <input type="date" class="form-control" id="paymentDate" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Dio ahorro:</label>
+                        <div class="d-flex gap-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="gaveSavings" id="gaveSavingsYes" value="yes">
+                                <label class="form-check-label" for="gaveSavingsYes">Sí</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="gaveSavings" id="gaveSavingsNo" value="no">
+                                <label class="form-check-label" for="gaveSavingsNo">No</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Lo dio a tiempo:</label>
+                        <div class="d-flex gap-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="onTime" id="onTimeYes" value="yes" onclick="toggleFundDays()">
+                                <label class="form-check-label" for="onTimeYes">Sí</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="onTime" id="onTimeNo" value="no" onclick="toggleFundDays()">
+                                <label class="form-check-label" for="onTimeNo">No</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3" id="fundDaysDiv" style="display: none;">
+                        <label for="fundDays" class="form-label">Cuantos Días de Atraso Tuvo?:</label>
+                        <input type="number" class="form-control" id="fundDays" min="0">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Dio caja de ahorro:</label>
+                        <div class="d-flex gap-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="gaveFund" id="gaveFundYes" value="yes" onclick="toggleFundAmount()">
+                                <label class="form-check-label" for="gaveFundYes">Sí</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="gaveFund" id="gaveFundNo" value="no" onclick="toggleFundAmount()">
+                                <label class="form-check-label" for="gaveFundNo">No</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3" id="fundAmountDiv" style="display: none;">
+                        <label for="fundAmount" class="form-label">Cantidad:</label>
+                        <input type="number" class="form-control" id="fundAmount" min="0">
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">Guardar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+  
+    <script>
+        const participantes = [
+            "Juan Pablo Perez Alvarez", "Ana Lilia Vela Jimenez", "Berna Ariana Prudente Rodriguez",
+            "Aurora Azucena Quintero Nuñez", "Fatima de Jesus Ruiz Garcia", "Guillermo Murgia Barradas",
+            "Zuleyma Jazmin Fuentes Cantero"
+        ];
+
+        const semanas = [
+            "1ra (Primera)", "2da (Segunda)", "3ra (Tercera)", "4ta (Cuarta)", "5ta (Quinta)",
+            "6ta (Sexta)", "7ma (Séptima)", "8va (Octava)", "9na (Novena)", "10ma (Décima)",
+            "11va (Undécima)", "12va (Duodécima)", "13va (Decimotercera)", "14va (Decimocuarta)",
+            "15va (Decimoquinta)", "16va (Decimosexta)"
+        ];
+
+        const startDate = new Date("2025-01-13");
+
+        // Generar tabla basada en filtro
+        function generateTable(filter = "") {
+            const tbody = document.querySelector("#participanteTable tbody");
+            tbody.innerHTML = ""; // Limpiar tabla
+
+            if (!filter) return; // Si no se selecciona un participante, no mostrar nada
+
+            const filteredParticipantes = participantes.filter(part => !filter || part === filter);
+            filteredParticipantes.forEach(participante => {
+                semanas.forEach((semana, index) => {
+                    const fecha = new Date(startDate);
+                    fecha.setDate(startDate.getDate() + index * 7);
+
+                    const row = `
+                        <tr>
+                            <td>${participante}</td>
+                            <td>${semana}</td>
+                            <td>${fecha.toLocaleDateString()}</td>
+                            <td>-</td>
+                            <td>-</td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+            });
+            document.getElementById("participanteTable").style.display = "block";
+        }
+
+        // Poblar dropdown del filtro
+        function populateFilterOptions() {
+            const filterSelect = document.getElementById("participantFilter");
+            filterSelect.innerHTML = '<option value="">Todos</option>'; // Limpiar opciones previas
+            participantes.forEach(participante => {
+                const option = document.createElement("option");
+                option.value = participante;
+                option.textContent = participante;
+                filterSelect.appendChild(option);
+            });
+        }
+
+        // Mostrar tabla de participantes
+        document.getElementById("btnParticipante").addEventListener("click", () => {
+            document.getElementById("participanteSelection").classList.remove("hidden");
+            document.getElementById("asesorEncargadaForm").classList.add("hidden");
+            document.getElementById("loginForm").classList.add("hidden");
+            populateFilterOptions(); // Llamar para refrescar el filtro
+            generateTable(); // Mostrar la tabla
+        });
+
+        // Mostrar el formulario "Login" al presionar "Asesor-Encargada"
+        document.getElementById("btnAsesorEncargada").addEventListener("click", () => {
+            document.getElementById("loginForm").classList.remove("hidden");
+            document.getElementById("asesorEncargadaForm").classList.add("hidden");
+            document.getElementById("participanteSelection").classList.add("hidden");
+        });
+
+        // Filtrar participantes en la tabla
+        document.getElementById("participantFilter").addEventListener("change", (event) => {
+            generateTable(event.target.value);
+        });
+
+        // Login
+        document.getElementById("login").addEventListener("submit", (e) => {
+            e.preventDefault();
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+
+            if (username === "Asesor" && password === "1234") {
+                document.getElementById("loginForm").classList.add("hidden");
+                document.getElementById("asesorEncargadaForm").classList.remove("hidden");
+                document.getElementById("loginError").classList.add("hidden");
+            } else {
+                document.getElementById("loginError").classList.remove("hidden");
+            }
+        });
+
+        // Función para mostrar u ocultar los días de atraso si se selecciona "No" en "Lo dio a tiempo"
+        function toggleFundDays() {
+          const onTimeNo = document.getElementById('onTimeNo');
+          const fundDaysDiv = document.getElementById('fundDaysDiv');
+          if (onTimeNo.checked) {
+            fundDaysDiv.style.display = 'block';
+          } else {
+            fundDaysDiv.style.display = 'none';
+          }
+        }
+
+        // Función para mostrar u ocultar el monto de caja de ahorro si se selecciona "Sí" en "Dio caja de ahorro"
+        function toggleFundAmount() {
+          const gaveFundNo = document.getElementById('gaveFundNo');
+          const fundAmountDiv = document.getElementById('fundAmountDiv');
+          if (!gaveFundNo.checked) {
+            fundAmountDiv.style.display = 'block';
+          } else {
+            fundAmountDiv.style.display = 'none';
+          }
+        }
+
+        // Inicialización
+        populateFilterOptions();
+    </script>
+
+</body>
+</html>
