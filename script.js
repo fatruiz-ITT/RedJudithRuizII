@@ -69,9 +69,14 @@ async function generateTable(filter = "") {
             const excelRow = excelData.find(row => row[0] === participante && row[1] === semana);
 
             // Si se encuentra, obtener los valores de las columnas D, G y F
-            const pago = excelRow ? excelRow[3] : "-";  // Columna D
-            const abono = excelRow ? excelRow[6] : "-";  // Columna G
-            const ahorroEnCaja = excelRow ? excelRow[7] : "-";  // Columna F
+            let pago = excelRow ? excelRow[3] : "-";  // Columna D
+            let abono = excelRow ? excelRow[6] : "-";  // Columna G
+            let ahorroEnCaja = excelRow ? excelRow[7] : "-";  // Columna F
+
+            // Convertir los valores a "Si" o "No" si son "yes" o "no"
+            pago = (pago === "yes") ? "Si" : (pago === "no") ? "No" : "-";
+            abono = (abono === "yes") ? "Si" : (abono === "no") ? "No" : "-";
+            ahorroEnCaja = (ahorroEnCaja === "yes") ? "Si" : (ahorroEnCaja === "no") ? "No" : "-";
 
             const row = `
                 <tr>
@@ -88,6 +93,7 @@ async function generateTable(filter = "") {
     });
     document.getElementById("participanteTable").style.display = "block";
 }
+
 
 
 // Poblar dropdown del filtro
