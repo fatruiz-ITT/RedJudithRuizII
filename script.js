@@ -322,6 +322,47 @@ async function renovarAccessToken() {
     }
 }
 
+document.getElementById('printBtn').addEventListener('click', function () {
+  // Accede a jsPDF usando window.jspdf.jsPDF
+  const doc = new window.jspdf.jsPDF();
+
+  // Obtener las cabeceras de la tabla (thead)
+  const table = document.getElementById('participanteTable');
+  const headers = [];
+  table.querySelectorAll('thead th').forEach(header => {
+    headers.push(header.textContent.trim());
+  });
+
+  // Obtener las filas del cuerpo de la tabla (tbody)
+  const data = [];
+  table.querySelectorAll('tbody tr').forEach(row => {
+    const rowData = [];
+    row.querySelectorAll('td').forEach(cell => {
+      rowData.push(cell.textContent.trim());
+    });
+    data.push(rowData);
+  });
+
+  // Verifica si hay datos en la tabla
+  if (data.length === 0) {
+    alert('No hay datos en la tabla para exportar.');
+    return;
+  }
+
+  // Generar la tabla en el PDF
+  doc.autoTable({
+    head: [headers], // Cabeceras de la tabla
+    body: data,      // Datos de las filas
+    theme: 'grid',   // Tema de la tabla
+    startY: 10,      // Margen superior
+    headStyles: { fillColor: [000, 000, 000] }, // Opcional: estilo de cabecera
+  });
+
+  // Guardar el PDF
+  doc.save('tabla_participantes.pdf');
+});
+
+
 // Inicialización
 populateFilterOptions();
 populateWeekOptions();
