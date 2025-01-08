@@ -172,6 +172,104 @@ function populateFilterOptionsAsesor() {
         filterSelect.appendChild(option);
     });
 }
+
+
+document.getElementById("paymentForm").addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    // Obtener valores del formulario
+    const participant = document.getElementById("participantSelect").value;
+    const week = document.getElementById("weekSelect").value;
+    const paymentDate = document.getElementById("paymentDate").value;
+    const gaveSavings = document.querySelector('input[name="gaveSavings"]:checked')?.value || "no";
+    const onTime = document.querySelector('input[name="onTime"]:checked')?.value || "no";
+    const fundDays = onTime === "no" ? document.getElementById("fundDays").value || "0" : "NA";
+    const gaveFund = document.querySelector('input[name="gaveFund"]:checked')?.value || "no";
+    const fundAmount = gaveFund === "yes" ? document.getElementById("fundAmount").value || "0" : "0";
+
+    // Validación simple
+    if (!participant || !week || !paymentDate) {
+        alert("Por favor completa todos los campos requeridos.");
+        return;
+    }
+
+    // Formar los datos para enviar
+    const data = {
+        values: [
+            [participant, week, paymentDate, gaveSavings, onTime, fundDays, gaveFund, fundAmount],
+        ],
+    };
+
+    // ID de la hoja y rango
+    const SHEET_ID = "1S3pmpHig1b-Zt3UCOmFF6LktaRT-tZzM79uAZdn-7U8"; // Reemplaza con el ID de tu hoja
+    const RANGE = "Hoja1!A:H"; // Rango en la hoja donde guardar los datos
+    const BASE_URL = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}:append?valueInputOption=USER_ENTERED`;
+
+    try {
+        // Renovar token de acceso
+        const accessToken = await renovarAccessToken();
+        if (!accessToken) {
+            alert("No se pudo obtener un token de acceso válido.");
+            return;
+        }
+
+        // Enviar los datos a la hoja de cálculo
+        const response = await fetch(BASE_URL, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${accessToken}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        });
+
+        if (response.ok) {
+            alert("Datos guardados exitosamente.");
+            document.getElementById("paymentForm").reset();
+        } else {
+            console.error("Error al guardar los datos:", await response.text());
+            alert("Error al guardar los datos. Revisa la consola para más detalles.");
+        }
+    } catch (error) {
+        console.error("Error al enviar los datos:", error);
+        alert("Hubo un problema al conectarse a la API.");
+    }
+});
+
+// Función para renovar el token de acceso
+async function renovarAccessToken() {
+    const clientId = '217452065709-eoi637u5kp9929b3laob6in6a6skknjv.apps.googleusercontent.com';
+    const clientSecret = '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';
+    const refreshToken = '1//04YzbTZvht8juCgYIARAAGAQSNwF-L9Ir9GmX3DjgLJnUPsgP889ElWofH2CYxZFwreBsPbLwdSpVXUNw-lsly-p8cuf0Nhje4U4';
+
+    const body = new URLSearchParams({
+        client_id: clientId,
+        client_secret: clientSecret,
+        refresh_token: refreshToken,
+        grant_type: 'refresh_token',
+    });
+
+    try {
+        const response = await fetch('https://oauth2.googleapis.com/token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: body.toString(),
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            return data.access_token;
+        } else {
+            console.error('Error al renovar el token de acceso:', await response.text());
+            alert('No se pudo renovar el token de acceso.');
+        }
+    } catch (error) {
+        console.error('Error al renovar el token:', error);
+    }
+}
+
 // Inicialización
 populateFilterOptions();
 populateWeekOptions();
