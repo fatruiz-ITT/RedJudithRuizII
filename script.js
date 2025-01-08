@@ -16,18 +16,30 @@ const startDate = new Date("2025-01-14");
 async function fetchExcelData() {
     const SHEET_ID = "1S3pmpHig1b-Zt3UCOmFF6LktaRT-tZzM79uAZdn-7U8"; // ID de tu hoja de cálculo
     const RANGE = "Hoja1!A:H"; // El rango que necesitas, ajusta según la estructura de tu archivo Excel
-    const BASE_URL = "https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}";
-
+    const BASE_URL = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}`;
 
     try {
+        // Obtener el token de acceso renovado
+        const accessToken = await renovarAccessToken(); // Llamamos a la función para obtener el token
+
+        if (!accessToken) {
+            console.error("No se pudo obtener un token de acceso válido.");
+            return [];
+        }
+
         // Obtener datos del archivo Excel (Google Sheets API)
         const response = await fetch(BASE_URL, {
             method: "GET",
             headers: {
-                "Authorization": `Bearer ${yourAccessToken}`, // Añade tu token de acceso válido
-
+                "Authorization": `Bearer ${accessToken}`, // Usa el token renovado
             },
         });
+
+        if (!response.ok) {
+            console.error("Error en la solicitud:", await response.text());
+            return [];
+        }
+
         const data = await response.json();
         return data.values; // Retorna los valores de la hoja de cálculo
     } catch (error) {
@@ -35,6 +47,9 @@ async function fetchExcelData() {
         return [];
     }
 }
+
+
+
 // Generar tabla basada en filtro
 async function generateTable(filter = "") {
     const tbody = document.querySelector("#participanteTable tbody");
