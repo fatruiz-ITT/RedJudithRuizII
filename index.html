@@ -154,76 +154,92 @@
       </div>
 </div>
 
-  <!-- Formulario Asesor Encargada -->
-          <div id="asesorEncargadaForm" class="card shadow-lg mt-4 hidden">
-              <div class="card-header bg-secondary text-white text-center">
-                  <h3>Registro de Pagos</h3>
-              </div>
-              <div class="card-body">
-                  <form id="paymentForm">
-                      <div class="mb-3">
-                          <label for="participantSelect" class="form-label">Participante:</label>
-                          <select id="participantSelect" class="form-select" required>
-                              <option value="">Seleccione un participante</option>
-                          </select>
-                      </div>
-                      <div class="mb-3">
-                          <label for="paymentDate" class="form-label">Fecha de pago:</label>
-                          <input type="date" class="form-control" id="paymentDate" required>
-                      </div>
-                      <div class="mb-3">
-                          <label class="form-label">Dio ahorro:</label>
-                          <div class="d-flex gap-3">
-                              <div class="form-check">
-                                  <input class="form-check-input" type="radio" name="gaveSavings" id="gaveSavingsYes" value="yes">
-                                  <label class="form-check-label" for="gaveSavingsYes">Sí</label>
-                              </div>
-                              <div class="form-check">
-                                  <input class="form-check-input" type="radio" name="gaveSavings" id="gaveSavingsNo" value="no">
-                                  <label class="form-check-label" for="gaveSavingsNo">No</label>
-                              </div>
-                          </div>
-                      </div>
-                      <div class="mb-3">
-                          <label class="form-label">Lo dio a tiempo:</label>
-                          <div class="d-flex gap-3">
-                              <div class="form-check">
-                                  <input class="form-check-input" type="radio" name="onTime" id="onTimeYes" value="yes" onclick="toggleFundDays()">
-                                  <label class="form-check-label" for="onTimeYes">Sí</label>
-                              </div>
-                              <div class="form-check">
-                                  <input class="form-check-input" type="radio" name="onTime" id="onTimeNo" value="no" onclick="toggleFundDays()">
-                                  <label class="form-check-label" for="onTimeNo">No</label>
-                              </div>
-                          </div>
-                      </div>
-                      <div class="mb-3" id="fundDaysDiv" style="display: none;">
-                          <label for="fundDays" class="form-label">Cuantos Días de Atraso Tuvo?:</label>
-                          <input type="number" class="form-control" id="fundDays" min="0">
-                      </div>
+<!-- Formulario Asesor Encargada -->
+<div id="asesorEncargadaForm" class="card shadow-lg mt-4 hidden">
+    <div class="card-header bg-secondary text-white text-center">
+        <h3>Registro de Pagos</h3>
+    </div>
+    <div class="card-body">
+        <form id="paymentForm">
+            <!-- Participante -->
+            <div class="mb-3">
+                <label for="participantSelect" class="form-label">Participante:</label>
+                <select id="participantSelect" class="form-select" required>
+                    <option value="">Seleccione un participante</option>
+                </select>
+            </div>
 
-                      <div class="mb-3">
-                          <label class="form-label">Dio caja de ahorro:</label>
-                          <div class="d-flex gap-3">
-                              <div class="form-check">
-                                  <input class="form-check-input" type="radio" name="gaveFund" id="gaveFundYes" value="yes" onclick="toggleFundAmount()">
-                                  <label class="form-check-label" for="gaveFundYes">Sí</label>
-                              </div>
-                              <div class="form-check">
-                                  <input class="form-check-input" type="radio" name="gaveFund" id="gaveFundNo" value="no" onclick="toggleFundAmount()">
-                                  <label class="form-check-label" for="gaveFundNo">No</label>
-                              </div>
-                          </div>
-                      </div>
-                      <div class="mb-3" id="fundAmountDiv" style="display: none;">
-                          <label for="fundAmount" class="form-label">Cantidad:</label>
-                          <input type="number" class="form-control" id="fundAmount" min="0">
-                      </div>
-                      <button type="submit" class="btn btn-success w-100">Guardar</button>
-                  </form>
-              </div>
-          </div>
-      </div>
+            <!-- Dropdown de Semana -->
+            <div class="mb-3">
+                <label for="weekSelect" class="form-label">Selecciona Semana de Pago:</label>
+                <select id="weekSelect" class="form-select" required>
+                    <option value="">Seleccione una semana</option>
+                </select>
+            </div>
+
+            <!-- Fecha de Pago (no editable) -->
+            <div class="mb-3">
+                <label for="paymentDate" class="form-label">Fecha de pago:</label>
+                <input type="text" class="form-control" id="paymentDate" disabled readonly>
+            </div>
+
+            <!-- Dió ahorro -->
+            <div class="mb-3">
+                <label class="form-label">Dio ahorro:</label>
+                <div class="d-flex gap-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="gaveSavings" id="gaveSavingsYes" value="yes">
+                        <label class="form-check-label" for="gaveSavingsYes">Sí</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="gaveSavings" id="gaveSavingsNo" value="no">
+                        <label class="form-check-label" for="gaveSavingsNo">No</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lo dio a tiempo -->
+            <div class="mb-3">
+                <label class="form-label">Lo dio a tiempo:</label>
+                <div class="d-flex gap-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="onTime" id="onTimeYes" value="yes" onclick="toggleFundDays()">
+                        <label class="form-check-label" for="onTimeYes">Sí</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="onTime" id="onTimeNo" value="no" onclick="toggleFundDays()">
+                        <label class="form-check-label" for="onTimeNo">No</label>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-3" id="fundDaysDiv" style="display: none;">
+                <label for="fundDays" class="form-label">Cuantos Días de Atraso Tuvo?:</label>
+                <input type="number" class="form-control" id="fundDays" min="0">
+            </div>
+
+            <!-- Dió caja de ahorro -->
+            <div class="mb-3">
+                <label class="form-label">Dio caja de ahorro:</label>
+                <div class="d-flex gap-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="gaveFund" id="gaveFundYes" value="yes" onclick="toggleFundAmount()">
+                        <label class="form-check-label" for="gaveFundYes">Sí</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="gaveFund" id="gaveFundNo" value="no" onclick="toggleFundAmount()">
+                        <label class="form-check-label" for="gaveFundNo">No</label>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-3" id="fundAmountDiv" style="display: none;">
+                <label for="fundAmount" class="form-label">Cantidad:</label>
+                <input type="number" class="form-control" id="fundAmount" min="0">
+            </div>
+            <button type="submit" class="btn btn-success w-100">Guardar</button>
+        </form>
+    </div>
+</div>
+
 
       <script src="script.js"></script>
 
