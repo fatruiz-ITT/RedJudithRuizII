@@ -54,7 +54,7 @@ async function generateTable(filter = "") {
             // Si se encuentra, obtener los valores de las columnas D, G y F
             const pago = excelRow ? excelRow[3] : "-";  // Columna D
             const abono = excelRow ? excelRow[6] : "-";  // Columna G
-            const ahorroEnCaja = excelRow ? excelRow[5] : "-";  // Columna F
+            const ahorroEnCaja = excelRow ? excelRow[7] : "-";  // Columna F
 
             const row = `
                 <tr>
