@@ -16,7 +16,8 @@ const startDate = new Date("2025-01-14");
 async function fetchExcelData() {
     const SHEET_ID = "1S3pmpHig1b-Zt3UCOmFF6LktaRT-tZzM79uAZdn-7U8"; // ID de tu hoja de cálculo
     const RANGE = "Hoja1!A:H"; // El rango que necesitas, ajusta según la estructura de tu archivo Excel
-    const BASE_URL = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}`;
+    const BASE_URL = "https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}";
+
 
     try {
         // Obtener datos del archivo Excel (Google Sheets API)
@@ -24,6 +25,7 @@ async function fetchExcelData() {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${yourAccessToken}`, // Añade tu token de acceso válido
+
             },
         });
         const data = await response.json();
