@@ -76,7 +76,6 @@ async function generateTable(filter = "") {
             // Convertir los valores a "Si" o "No" si son "yes" o "no"
             pago = (pago === "yes") ? "Si" : (pago === "no") ? "No" : "-";
             abono = (abono === "yes") ? "Si" : (abono === "no") ? "No" : "-";
-            ahorroEnCaja = (ahorroEnCaja === "yes") ? "Si" : (ahorroEnCaja === "no") ? "No" : "-";
 
             const row = `
                 <tr>
