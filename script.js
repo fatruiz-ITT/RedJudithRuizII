@@ -1,119 +1,247 @@
-const participantes = [
-    "Juan Pablo Perez Alvarez", "Ana Lilia Vela Jimenez", "Berna Ariana Prudente Rodriguez",
-    "Aurora Azucena Quintero Nuñez", "Fatima de Jesus Ruiz Garcia", "Guillermo Murgia Barradas",
-    "Zuleyma Jazmin Fuentes Cantero"
-];
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Red Judith Ruiz II</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        .main-container {
+            max-width: 800px;
+            margin: auto;
+        }
+        .welcome-message {
+            font-size: 1.25rem;
+            margin-bottom: 30px;
+        }
+        .card-btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 150px;
+            font-size: 1.25rem;
+            cursor: pointer;
+            text-align: center;
+        }
+        .card-btn i {
+            font-size: 3rem;
+        }
+        .custom-btn-group .card {
+            margin: 10px;
+            border: 1px solid #ccc;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+            height: auto;
+        }
+        .custom-btn-group .card:hover {
+            transform: scale(1.05);
+        }
+        .card-body h5 {
+            margin-top: 10px;
+            font-size: 1.2rem;
+        }
+        .responsive-table {
+            display: none;
+            margin-top: 20px;
+        }
+        .hidden {
+            display: none !important;
+        }
+        .table-wrapper {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
 
-const semanas = [
-    "1ra", "2da", "3ra", "4ta", "5ta",
-    "6ta", "7ma", "8va", "9na", "10ma",
-    "11va", "12va", "13va", "14va",
-    "15va", "16va"
-];
+    <div class="container mt-5 main-container">
+        <div class="text-center">
+            <h1 class="mb-4">Red Judith Ruiz II</h1>
+            <p class="welcome-message">Bienvenidos a tu página para control de pagos. Aquí podrás visualizar los pagos realizados y los que faltan, además del acumulado de tu caja de ahorro si realizas aportes, y el progreso de tus compañeros. Por favor, selecciona una opción:</p>
+        </div>
 
-const startDate = new Date("2025-01-14");
+        <!-- Botones principales con iconos y diseño tarjeta -->
+        <div class="d-flex flex-wrap justify-content-center custom-btn-group">
+            <div class="col-12 col-md-5 col-lg-3">
+                <div class="card btn btn-primary card-btn" id="btnParticipante">
+                    <div class="card-body text-center">
+                        <i class="fas fa-users"></i>
+                        <h5>Ver Pagos - Participantes</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-5 col-lg-3">
+                <div class="card btn btn-info card-btn" id="btnAsesorEncargada">
+                    <div class="card-body text-center">
+                        <i class="fas fa-user-cog"></i>
+                        <h5>Asesor-Encargada</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-// Generar tabla basada en filtro
-function generateTable(filter = "") {
-    const tbody = document.querySelector("#participanteTable tbody");
-    tbody.innerHTML = ""; // Limpiar tabla
+        <!-- Formulario de Login -->
+         <div id="loginForm" class="card shadow-lg mt-4 hidden">
+             <div class="card-header bg-secondary text-white text-center">
+                 <h3>Iniciar Sesión</h3>
+             </div>
+             <!-- Mensaje de error de login -->
+             <div id="loginError" class="alert alert-danger hidden" role="alert">
+                 <strong>¡Error!</strong> Sección solo para Asesor o Encargada. Si eres alguna de ellas, contacta a Judith para actualizar la contraseña.
+             </div>
 
-    if (!filter) return; // Si no se selecciona un participante, no mostrar nada
+             <div class="card-body">
+                 <form id="login">
+                     <div class="mb-3">
+                         <label for="username" class="form-label">Usuario:</label>
+                         <input type="text" id="username" class="form-control" required>
+                     </div>
+                     <div class="mb-3">
+                         <label for="password" class="form-label">Contraseña:</label>
+                         <input type="password" id="password" class="form-control" required>
+                     </div>
+                     <button type="submit" class="btn btn-primary w-100">Ingresar</button>
+                 </form>
+             </div>
+         </div>
 
-    const filteredParticipantes = participantes.filter(part => !filter || part === filter);
-    filteredParticipantes.forEach(participante => {
-        semanas.forEach((semana, index) => {
-            const fecha = new Date(startDate);
-            fecha.setDate(startDate.getDate() + index * 7);
+        <!-- Opciones de Participante y Asesor -->
 
-            const row = `
-                <tr>
-                    <td>${participante}</td>
-                    <td>${semana}</td>
-                    <td>${fecha.toLocaleDateString()}</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                </tr>
-            `;
-            tbody.innerHTML += row;
-        });
-    });
-    document.getElementById("participanteTable").style.display = "block";
-}
+        <div id="participanteSelection" class="hidden">
+          <div class="mb-3">
+              <label for="participantFilter" class="form-label">Filtrar por participante:</label>
+              <div class="input-group">
+                  <span class="input-group-text bg-primary text-white">
+                      <i class="fas fa-filter"></i>
+                  </span>
+                  <select id="participantFilter" class="form-select" required>
+                      <option value="">Todos</option>
+                  </select>
+              </div>
+         </div>
 
-// Poblar dropdown del filtro
-function populateFilterOptions() {
-    const filterSelect = document.getElementById("participantFilter");
-    filterSelect.innerHTML = '<option value="">Todos</option>'; // Limpiar opciones previas
-    participantes.forEach(participante => {
-        const option = document.createElement("option");
-        option.value = participante;
-        option.textContent = participante;
-        filterSelect.appendChild(option);
-    });
-}
+            <!-- Tabla de Participantes -->
+            <div id="participanteTable" class="responsive-table">
+                          <div class="card shadow-lg">
+                              <div class="card-header bg-primary text-white text-center">
+                                  <h3>Participantes</h3>
+                              </div>
+            <div class="card-body">
+                <!-- Tabla Responsive -->
+                <div class="table-responsive">
+                    <table id="participanteTable" class="table table-striped">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Participante</th>
+                                <th>Semana</th>
+                                <th>Fecha</th>
+                                <th>Pago</th>
+                                <th>Abono</th>
+                                <th>Lleva de Ahorro En Caja</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Filas generadas dinámicamente -->
+                        </tbody>
+                    </table>
+                    <div class="text-center">
+                            <button class="btn btn-success" id="printBtn">Guardar PDF</button>
+                    </div>
+                </div>
+              </div>
+          </div>
+      </div>
+</div>
 
-// Mostrar tabla de participantes
-document.getElementById("btnParticipante").addEventListener("click", () => {
-    document.getElementById("participanteSelection").classList.remove("hidden");
-    document.getElementById("asesorEncargadaForm").classList.add("hidden");
-    document.getElementById("loginForm").classList.add("hidden");
-    populateFilterOptions(); // Llamar para refrescar el filtro
-    generateTable(); // Mostrar la tabla
-});
+<!-- Formulario Asesor Encargada -->
+<div id="asesorEncargadaForm" class="card shadow-lg mt-4 hidden">
+    <div class="card-header bg-secondary text-white text-center">
+        <h3>Registro de Pagos</h3>
+    </div>
+    <div class="card-body">
+        <form id="paymentForm">
+            <!-- Participante -->
+            <div class="mb-3">
+                <label for="participantSelect" class="form-label">Participante:</label>
+                <select id="participantSelect" class="form-select" required>
+                    <option value="">Seleccione un participante</option>
+                </select>
+            </div>
 
-// Mostrar el formulario Login al hacer clic en "Asesor-Encargada"
-document.getElementById('btnAsesorEncargada').addEventListener('click', function() {
-    document.getElementById('loginForm').classList.remove('hidden');
-    document.getElementById('asesorEncargadaForm').classList.add('hidden');
-    document.getElementById('participanteSelection').classList.add('hidden');
-});
+            <!-- Dropdown de Semana -->
+            <div class="mb-3">
+                <label for="weekSelect" class="form-label">Selecciona Semana de Pago:</label>
+                <select id="weekSelect" class="form-select" required>
+                    <option value="">Seleccione una semana</option>
+                </select>
+            </div>
 
-// Login
-document.getElementById('login').addEventListener('submit', function(event) {
-    event.preventDefault(); // Evita que se recargue la página al hacer submit del formulario
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
+            <!-- Fecha de Pago (no editable) -->
+            <div class="mb-3">
+                <label for="paymentDate" class="form-label">Fecha de pago:</label>
+                <input type="text" class="form-control" id="paymentDate" disabled readonly>
+            </div>
 
-    // Aquí agregamos una simple verificación de usuario y contraseña
-    if (username === 'Asesor' && password === '1234') {
-        // Login exitoso: ocultar el formulario de login y mostrar el formulario "Asesor-Encargada"
-        document.getElementById('loginForm').classList.add('hidden');
-        document.getElementById('loginError').classList.add('hidden'); // Ocultar mensaje de error si las credenciales son correctas
-        document.getElementById('asesorEncargadaForm').classList.remove('hidden');
-    } else {
-        // Mostrar mensaje de error si el login falla
-        document.getElementById('loginError').classList.remove('hidden');
-    }
-});
+            <!-- Dió ahorro -->
+            <div class="mb-3">
+                <label class="form-label">Dio ahorro:</label>
+                <div class="d-flex gap-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="gaveSavings" id="gaveSavingsYes" value="yes">
+                        <label class="form-check-label" for="gaveSavingsYes">Sí</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="gaveSavings" id="gaveSavingsNo" value="no">
+                        <label class="form-check-label" for="gaveSavingsNo">No</label>
+                    </div>
+                </div>
+            </div>
 
-// Función para mostrar u ocultar los días de atraso si se selecciona "No" en "Lo dio a tiempo"
-function toggleFundDays() {
-    const onTimeNo = document.getElementById('onTimeNo');
-    const fundDaysDiv = document.getElementById('fundDaysDiv');
-    if (onTimeNo.checked) {
-        fundDaysDiv.style.display = 'block';
-    } else {
-        fundDaysDiv.style.display = 'none';
-    }
-}
+            <!-- Lo dio a tiempo -->
+            <div class="mb-3">
+                <label class="form-label">Lo dio a tiempo:</label>
+                <div class="d-flex gap-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="onTime" id="onTimeYes" value="yes" onclick="toggleFundDays()">
+                        <label class="form-check-label" for="onTimeYes">Sí</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="onTime" id="onTimeNo" value="no" onclick="toggleFundDays()">
+                        <label class="form-check-label" for="onTimeNo">No</label>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-3" id="fundDaysDiv" style="display: none;">
+                <label for="fundDays" class="form-label">Cuantos Días de Atraso Tuvo?:</label>
+                <input type="number" class="form-control" id="fundDays" min="0">
+            </div>
 
-// Función para mostrar u ocultar el monto de caja de ahorro si se selecciona "Sí" en "Dio caja de ahorro"
-function toggleFundAmount() {
-    const gaveFundNo = document.getElementById('gaveFundNo');
-    const fundAmountDiv = document.getElementById('fundAmountDiv');
-    if (!gaveFundNo.checked) {
-        fundAmountDiv.style.display = 'block';
-    } else {
-        fundAmountDiv.style.display = 'none';
-    }
-}
+            <!-- Dió caja de ahorro -->
+            <div class="mb-3">
+                <label class="form-label">Dio caja de ahorro:</label>
+                <div class="d-flex gap-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="gaveFund" id="gaveFundYes" value="yes" onclick="toggleFundAmount()">
+                        <label class="form-check-label" for="gaveFundYes">Sí</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="gaveFund" id="gaveFundNo" value="no" onclick="toggleFundAmount()">
+                        <label class="form-check-label" for="gaveFundNo">No</label>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-3" id="fundAmountDiv" style="display: none;">
+                <label for="fundAmount" class="form-label">Cantidad:</label>
+                <input type="number" class="form-control" id="fundAmount" min="0">
+            </div>
+            <button type="submit" class="btn btn-success w-100">Guardar</button>
+        </form>
+    </div>
+</div>
 
-// Filtrar participantes en la tabla
-document.getElementById("participantFilter").addEventListener("change", (event) => {
-    generateTable(event.target.value);
-});
 
-// Inicialización
-populateFilterOptions();
+      <script src="script.js"></script>
+
+</body>
+</html>
