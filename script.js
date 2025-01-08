@@ -15,26 +15,36 @@ const startDate = new Date("2025-01-14");
 
 
 // Generar tabla basada en filtro
-function generateTable(filter = "") {
+async function generateTable(filter = "") {
     const tbody = document.querySelector("#participanteTable tbody");
     tbody.innerHTML = ""; // Limpiar tabla
 
     if (!filter) return; // Si no se selecciona un participante, no mostrar nada
 
     const filteredParticipantes = participantes.filter(part => !filter || part === filter);
+    const excelData = await fetchExcelData(); // Obtener los datos del archivo Excel
+
     filteredParticipantes.forEach(participante => {
         semanas.forEach((semana, index) => {
             const fecha = new Date(startDate);
             fecha.setDate(startDate.getDate() + index * 7);
+
+            // Buscar si existe una coincidencia en el archivo Excel
+            const excelRow = excelData.find(row => row[0] === participante && row[1] === semana);
+
+            // Si se encuentra, obtener los valores de las columnas D, G y F
+            const pago = excelRow ? excelRow[3] : "-";  // Columna D
+            const abono = excelRow ? excelRow[6] : "-";  // Columna G
+            const ahorroEnCaja = excelRow ? excelRow[5] : "-";  // Columna F
 
             const row = `
                 <tr>
                     <td>${participante}</td>
                     <td>${semana}</td>
                     <td>${fecha.toLocaleDateString()}</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
+                    <td>${pago}</td>
+                    <td>${abono}</td>
+                    <td>${ahorroEnCaja}</td>
                 </tr>
             `;
             tbody.innerHTML += row;
@@ -42,6 +52,7 @@ function generateTable(filter = "") {
     });
     document.getElementById("participanteTable").style.display = "block";
 }
+
 
 // Poblar dropdown del filtro
 function populateFilterOptions() {
@@ -113,7 +124,7 @@ function toggleFundAmount() {
 
 // Filtrar participantes en la tabla
 document.getElementById("participantFilter").addEventListener("change", (event) => {
-    generateTable(event.target.value);
+    generateTable(event.target.value);  // Filtrar participantes en la tabla
 });
 
 // Cargar las semanas en el dropdown
@@ -269,6 +280,29 @@ async function renovarAccessToken() {
         console.error('Error al renovar el token:', error);
     }
 }
+
+async function fetchExcelData() {
+    const SHEET_ID = "1S3pmpHig1b-Zt3UCOmFF6LktaRT-tZzM79uAZdn-7U8"; // ID de tu hoja de cálculo
+    const RANGE = "Hoja1!A:H"; // El rango que necesitas, ajusta según la estructura de tu archivo Excel
+    const BASE_URL = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}`;
+
+    try {
+        // Obtener datos del archivo Excel (Google Sheets API)
+        const response = await fetch(BASE_URL, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${yourAccessToken}`, // Añade tu token de acceso válido
+            },
+        });
+        const data = await response.json();
+        return data.values; // Retorna los valores de la hoja de cálculo
+    } catch (error) {
+        console.error("Error al obtener datos del archivo:", error);
+        return [];
+    }
+}
+
+
 
 // Inicialización
 populateFilterOptions();
